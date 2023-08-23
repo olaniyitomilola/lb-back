@@ -1,5 +1,5 @@
 const { DatabaseError } = require('pg');
-const {DB,checkIfDbExist, createLB,checkIfTableExists,createUserTable,createCoursesTable} = require('./connect');
+const {DB,checkIfDbExist, createLB,checkIfTableExists,createUserTable,createCoursesTable, createCourseAssessments} = require('./connect');
 
 
 async function start(){
@@ -29,6 +29,13 @@ async function start(){
 
             if(!coursesCheck){
                 await createCoursesTable(DB)
+                //create product table
+            }
+
+            let courseAssessmentCheck = await checkIfTableExists('courseassessment', DB)
+
+            if(!courseAssessmentCheck){
+                await createCourseAssessments(DB)
                 //create product table
             }
             // //check orders table

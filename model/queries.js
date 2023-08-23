@@ -102,6 +102,71 @@ async function getUser(email){
 }
 
 
+async function getUserDetails(email){
+    const query = `
+        SELECT id,email,first_name,last_name,level,language  FROM users
+        WHERE email = $1;
+    `
+    try{
+            let result = await DB.query(query,[email]);
+            if(!result.rows.length){
+                console.log("error thrown")
+                throw new UserError('User does not Exist');
+                
+            }
+            console.log("fetched")
+            return result.rows[0];
+
+    } catch(err){
+        if(err instanceof UserError) throw  err
+        throw new DatabaseError('error fetching user')
+    }
+}
+
+async function insertCourseAssessment(courseId,question,option_a,option_b,option_c,option_d,correct_answer){
+    const query = `
+    INSERT INTO courseassessment(course_id, question,option_a,option_b,option_c,option_d,correct_answer)
+    VALUES($1,$2,$3,$4,$5,$6,$7);
+    `
+    try{
+        await DB.query(query,[courseId,question,option_a,option_b,option_c,option_d,correct_answer])
+        return true;
+
+    } catch(err){
+        throw new DatabaseError(`Unable to Add courseAssement: ${err}`)
+    }
+}
 
 
-module.exports = {getAllUsers,createAccount,getAllcourses,Addcourse,getUserCourses,getUser};
+
+async function fetchAllCourseAssessment(){
+    const query = `
+    SELECT * FROM courseassessment
+    `
+    try{
+       let result = await DB.query(query)
+        return result.rows;
+
+    } catch(err){
+        throw new DatabaseError(`Unable to Add courseAssement: ${err}`)
+    }
+}
+
+
+
+async function fetchCourseAssessment(course_id){
+    const query = `
+    SELECT * FROM courseassessment
+    WHERE course_id = $1
+    `
+    try{
+       let result = await DB.query(query,[course_id])
+        return result.rows;
+
+    } catch(err){
+        throw new DatabaseError(`Unable to fetch assessments: ${err}`)
+    }
+}
+
+
+module.exports = { fetchCourseAssessment, fetchAllCourseAssessment,  insertCourseAssessment, getUserDetails , getAllUsers,createAccount,getAllcourses,Addcourse,getUserCourses,getUser};

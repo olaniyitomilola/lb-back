@@ -1,8 +1,9 @@
 const { DatabaseError } = require("../custom-errors/DatabaseError");
 const { CourseError } = require("../custom-errors/CourseError");
-const { getAllcourses,getUserCourses, getUser, createAccount } = require("../model/queries");
+const { getAllcourses,getUserCourses, getUser, createAccount, getUserDetails } = require("../model/queries");
 const { UserError } = require("../custom-errors/UserError");
 const bcrypt = require('bcrypt');
+const { GenerateToken } = require("../services/TokenServices");
 const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const namePattern = /^[A-Za-z\- ]+$/;
 
@@ -44,8 +45,10 @@ const fetchUserCourses = async(req,res,next)=>{
 
 }
 
-const signIn = async(req,res,next) =>{
+const Authenticate = async(req,res,next) =>{
     const {email,password} = req.body;
+
+    console.log(email,password, Object.keys(req.body))
 
 
     //validate email input true regex too
@@ -59,7 +62,8 @@ const signIn = async(req,res,next) =>{
 
         if(passwordMatch){
             //generate token here and send
-            return res.status(200).json({success : true, message: user.id})
+            const token = GenerateToken(email)
+            return res.status(200).json({success : true, token})
 
         }else{
             console.log(`${email}: Wrong password`)
@@ -78,6 +82,25 @@ const signIn = async(req,res,next) =>{
     }
 }
 
+const fetchUserDetails = async  (req,res)=>{
+     const {email} = req.user;
+
+     if(!email) return res.status(404).json({succes: false, message: "User not found"});
+
+     try {
+        const userDetails = await getUserDetails(email);
+        const userCourses = await getUserCourses(userDetails.level,userDetails.language);
+        console.log('sending details' + Object.keys(userDetails))
+        return res.status(200).json({success : true, courses : userCourses, details : userDetails})
+        
+     } catch (error) {
+        if(error instanceof UserError){
+           return res.status(404).json({success: false, message: "Not found"})
+        }
+        return res.status(500).json({success: false, message: "Server Error"})
+
+     }
+}
 
 const findUser = async(req,res,next) =>{
     const {email} = req.params;
@@ -143,4 +166,4 @@ const registerAccount = async(req,res,next) =>{
 }
 
 
-module.exports = {fetchAllCourses, fetchUserCourses,signIn, findUser,registerAccount};
+module.exports = { fetchUserDetails ,fetchAllCourses, fetchUserCourses, Authenticate, findUser,registerAccount};

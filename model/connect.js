@@ -103,6 +103,19 @@ async function alterCourseTable(){
 }
 
 
+async function dropTable(name){
+    const alterQuery = `
+    DROP TABLE courseassessment
+  `;
+
+  try {
+    await DB.query(alterQuery);
+    console.log(`Table ${name} deleted`);
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
 
 
 async function createCoursesTable(DB){
@@ -127,28 +140,32 @@ async function createCoursesTable(DB){
     
 
  }
-// //this table relates the user and their orders
-// async function createOrderTable(DB){
-//     //SERIAL is Auto-Increment int in postgres
-//      const query = `
-//         CREATE TABLE IF NOT EXISTS orders(
-//             id SERIAL PRIMARY KEY NOT NULL,
-//             user_id UUID,
-//             order_status VARCHAR(255),
-//             total_price NUMERIC(10,2),
-//             order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-//             FOREIGN KEY(user_id) REFERENCES users(id)
-//         );
-//     `;
-//     try{
-//         await DB.query(query);
-//         console.log('Table: orders created');
+//this table relates the course table using the courseID as foreign key
+async function createCourseAssessments(DB){
+    //SERIAL is Auto-Increment int in postgres
+     const query = `
+        CREATE TABLE IF NOT EXISTS courseAssessment(
+            id SERIAL PRIMARY KEY NOT NULL,
+            course_id UUID,
+            option_a VARCHAR(255),
+            option_b VARCHAR(255),
+            option_c VARCHAR(255),
+            option_d VARCHAR(255),
+            correct_answer VARCHAR(255),
+            question VARCHAR(255),
+            dateAdded TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(course_id) REFERENCES courses(id)
+        );
+    `;
+    try{
+        await DB.query(query);
+        console.log('Table: courseAssessment Table created');
 
-//     }catch(err){
-//         console.error(`Error:`, err)
-//     }
+    }catch(err){
+        console.error(`Error:`, err)
+    }
     
-// }
+}
 
 // //The table that relates the order with the products
 
@@ -175,4 +192,4 @@ async function createCoursesTable(DB){
 
 //remoeve event booking functionality for now
 
-module.exports = {DB,checkIfDbExist,createLB,checkIfTableExists,createUserTable,createCoursesTable,alterCourseTable};
+module.exports = {DB, dropTable, checkIfDbExist,createLB,checkIfTableExists,createUserTable,createCoursesTable,alterCourseTable,createCourseAssessments};
