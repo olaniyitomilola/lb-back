@@ -15,7 +15,6 @@ const GenerateToken = (email)=>{
 const VerifyToken = (req,res,next) =>{
     console.log('verifying token')
     let token = req.headers['authorization'];
-    console.log(token)
     if(!token){
         return res.status(401).json({success : false, message : 'Unauthorized'});
 

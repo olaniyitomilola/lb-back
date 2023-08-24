@@ -13,14 +13,14 @@ const DB = new Client({
     
 })
 
-async function checkIfDbExist(DB){
+async function checkIfDbExist(DB,dbname){
     const query = `
     SELECT datname
     FROM pg_database
     WHERE datname = $1
     `;
 
-    let res = await DB.query(query,['languagebuddy']);
+    let res = await DB.query(query,[dbname]);
     if(res.rowCount < 1){
         console.log('Language buddy  db does not exist, creating a new one')
         return false;
@@ -30,15 +30,15 @@ async function checkIfDbExist(DB){
     }
 }
 //create new db if it doesnt exists
-async function createLB(DB){
-    try{
-
-        await DB.query('CREATE DATABASE languagebuddy');
-
-        console.log('db created')
-
-    }catch(err){console.error(err)}
+async function createLB(DB, dbName) {
+  try {
+    await DB.query(`CREATE DATABASE ${dbName}`);
+    console.log(`Database '${dbName}' created`);
+  } catch (err) {
+    console.error(err);
+  }
 }
+
 
 //check if table exists, we are going to run this on all our tables
 
@@ -144,7 +144,7 @@ async function createCoursesTable(DB){
 async function createCourseAssessments(DB){
     //SERIAL is Auto-Increment int in postgres
      const query = `
-        CREATE TABLE IF NOT EXISTS courseAssessment(
+        CREATE TABLE IF NOT EXISTS courseassessment(
             id SERIAL PRIMARY KEY NOT NULL,
             course_id UUID,
             option_a VARCHAR(255),
@@ -167,29 +167,28 @@ async function createCourseAssessments(DB){
     
 }
 
-// //The table that relates the order with the products
+async function createCourseAssessmentUser(DB){
+    //SERIAL is Auto-Increment int in postgres
+     const query = `
+        CREATE TABLE IF NOT EXISTS course_assessment_user(
+            id SERIAL PRIMARY KEY NOT NULL,
+            user_id UUID,
+            courseassessment_id INT,
+            FOREIGN KEY(user_id) REFERENCES users(id),
+            FOREIGN KEY(courseassessment_id) REFERENCES courseassessment(id)
 
-// async function createOrderProductsTable(DB){
-//     const query = `
-//         CREATE TABLE IF NOT EXISTS order_products(
-//             id SERIAL PRIMARY KEY NOT NULL,
-//             order_id INT,
-//             product_id INT,
-//             quantity INT,
-//             FOREIGN KEY(order_id) REFERENCES orders(id),
-//             FOREIGN KEY(product_id) REFERENCES products(id)
-//         );
-//     `;
-//     try{
-//         await DB.query(query);
-//         console.log('Table: order_products created');
 
-//     }catch(err){
-//         console.error(`Error:`, err)
-//     }
+        );
+    `;
+    try{
+        await DB.query(query);
+        console.log('Table: courseAssessment_user Table created');
+
+    }catch(err){
+        console.error(`Error:`, err)
+    }
     
-// }
+}
 
-//remoeve event booking functionality for now
 
-module.exports = {DB, dropTable, checkIfDbExist,createLB,checkIfTableExists,createUserTable,createCoursesTable,alterCourseTable,createCourseAssessments};
+module.exports = {DB, createCourseAssessmentUser, dropTable, checkIfDbExist,createLB,checkIfTableExists,createUserTable,createCoursesTable,alterCourseTable,createCourseAssessments};

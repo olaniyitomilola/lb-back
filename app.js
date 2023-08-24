@@ -1,6 +1,6 @@
 'use-strict';
 const {courses} = require('./data')
-const {Addcourse,getAllcourses,getAllUsers, insertCourseAssessment, fetchAllCourseAssessment, fetchCourseAssessment} = require('./model/queries')
+const {Addcourse,getAllcourses,getAllUsers, insertCourseAssessment, fetchAllCourseAssessment, fetchCourseAssessment, fetchAllCourseAssessment_user} = require('./model/queries')
 const router = require('./route/api');
 const cors = require('cors');
 
@@ -33,8 +33,7 @@ async function startApp(){
         })
         
         let courseId = "cb2ff504-381a-485d-8aa6-813dbed44ec6"
-        console.log(await fetchCourseAssessment(courseId));
-
+      //  console.log(await fetchCourseAssessment(courseId));
        
         // frenchForBeginners2Questions.forEach(async (question)=>{
         //     await insertCourseAssessment(courseId, question.question, question.option_a, question.option_b, question.option_c, question.option_d, question.correct_answer);

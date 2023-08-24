@@ -138,6 +138,85 @@ async function insertCourseAssessment(courseId,question,option_a,option_b,option
 }
 
 
+async function insertCourseAssessment_user(assessment_id,user_id){
+    const query = `
+    INSERT INTO course_assessment_user(user_id,courseassessment_id)
+    VALUES($1,$2);
+    `
+    try{
+        await DB.query(query,[user_id,assessment_id])
+        console.log(`Inserted assessment: ${assessment_id} from user : ${user_id}`)
+        return true;
+
+    } catch(err){
+                console.log(`Unable to insert assessment: ${assessment_id} from user : ${user_id}`)
+
+        throw new DatabaseError(`Unable to Add courseAssement: ${err}`)
+    }
+}
+
+
+async function fetchCourseUserAssessment(courseId,user_id){
+    const query =
+    `
+        SELECT ca.id
+        FROM courseassessment ca
+        WHERE ca.course_id = $1
+        AND EXISTS (
+        SELECT 1
+        FROM course_assessment_user cu
+        WHERE cu.courseassessment_id = ca.id
+        AND cu.user_id = $2
+);
+
+
+    `
+      try{
+        console.log('checking here')
+        const assessments = await DB.query(query,[courseId,user_id])
+       
+       
+        return assessments.rows
+
+        
+
+    } catch(err){
+        throw new DatabaseError(`Unable to fetch course assessment user: ${err}`)
+    }
+}
+
+
+async function fetchCourseAssessment_user(assessment_id,user_id){
+    const query = `
+    SELECT * FROM course_assessment_user
+    WHERE user_id = $1 AND courseassessment_id = $2;
+    `
+    try{
+        const assessments = await DB.query(query,[user_id, assessment_id])
+        return assessments.rows
+
+    } catch(err){
+        throw new DatabaseError(`Unable to fetch course assessment user: ${err}`)
+    }
+}
+
+
+async function fetchAllCourseAssessment_user(){
+    const query = `
+    SELECT * FROM course_assessment_user
+   
+    `
+    try{
+        const assessments = await DB.query(query)
+        return assessments.rows
+
+    } catch(err){
+        throw new DatabaseError(`Unable to Add courseAssement: ${err}`)
+    }
+}
+
+
+
 
 async function fetchAllCourseAssessment(){
     const query = `
@@ -154,7 +233,7 @@ async function fetchAllCourseAssessment(){
 
 
 
-async function fetchCourseAssessment(course_id){
+async function getCourseAssessment(course_id){
     const query = `
     SELECT * FROM courseassessment
     WHERE course_id = $1
@@ -169,4 +248,4 @@ async function fetchCourseAssessment(course_id){
 }
 
 
-module.exports = { fetchCourseAssessment, fetchAllCourseAssessment,  insertCourseAssessment, getUserDetails , getAllUsers,createAccount,getAllcourses,Addcourse,getUserCourses,getUser};
+module.exports = { fetchCourseUserAssessment, fetchAllCourseAssessment_user,  fetchCourseAssessment_user, insertCourseAssessment_user , getCourseAssessment, fetchAllCourseAssessment,  insertCourseAssessment, getUserDetails , getAllUsers,createAccount,getAllcourses,Addcourse,getUserCourses,getUser};

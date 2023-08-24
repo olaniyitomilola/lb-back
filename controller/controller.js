@@ -1,6 +1,6 @@
 const { DatabaseError } = require("../custom-errors/DatabaseError");
 const { CourseError } = require("../custom-errors/CourseError");
-const { getAllcourses,getUserCourses, getUser, createAccount, getUserDetails } = require("../model/queries");
+const { getAllcourses,getUserCourses, getUser, createAccount, getUserDetails, getCourseAssessment, fetchCourseAssessment_user, insertCourseAssessment_user, fetchCourseUserAssessment } = require("../model/queries");
 const { UserError } = require("../custom-errors/UserError");
 const bcrypt = require('bcrypt');
 const { GenerateToken } = require("../services/TokenServices");
@@ -44,6 +44,32 @@ const fetchUserCourses = async(req,res,next)=>{
      }
 
 }
+
+
+const fetchCourseAssessments = async(req,res,next)=>{
+    //TODO: authenticate with user ID
+     const{courseId} = req.params;
+     console.log(courseId)
+
+     if(!courseId) return res.status(400).json({sucess: false, message: "Bad Request"})
+
+     try {
+
+        let courses = await getCourseAssessment(courseId);
+
+        return res.status(200).json({success: true, courses})
+        
+     } catch (error) {
+        if(error instanceof DatabaseError){
+            console.log(error.message)
+            return res.status(500).json({success: false, message: "Database Error", error})
+        }
+        return res.status(500).json({success: false, message: "Server Error"})
+     }
+
+}
+
+
 
 const Authenticate = async(req,res,next) =>{
     const {email,password} = req.body;
@@ -101,6 +127,80 @@ const fetchUserDetails = async  (req,res)=>{
 
      }
 }
+
+
+const fetchUserAssessments = async  (req,res)=>{
+    //Authenticate first
+     const {email} = req.user;
+     const{courseId} = req.params
+
+     if(!email) return res.status(404).json({succes: false, message: "User not found"});
+     if(!courseId) return res.status(404).json({succes: false, message: "User not found"});
+
+     try {
+        const userDetails = await getUserDetails(email);
+        let userId = userDetails.id;
+
+        let assessments = await fetchCourseUserAssessment(courseId,  userId);
+
+        console.log(assessments)
+
+        return res.status(200).json({success: true, assessments: assessments});
+       
+        
+     } catch (error) {
+        if(error instanceof UserError){
+           return res.status(404).json({success: false, message: "Not found"})
+        }
+        return res.status(500).json({success: false, message: "Server Error"})
+
+     }
+}
+
+
+const postUserAssessments = async  (req,res)=>{
+    //Authenticate first
+     const {email} = req.user;
+     const{courseId} = req.params;
+
+     console.log(req.params)
+
+     if(!email) return res.status(401).json({succes: false, message: "User not found"});
+     if(!courseId) return res.status(401).json({succes: false, message: "User not found"});
+
+     try {
+        const userDetails = await getUserDetails(email);
+
+    
+        let userId = userDetails.id;
+
+        //confirm that entry doesn't exist already
+
+        let check = await fetchCourseAssessment_user(courseId,userId)
+
+        if(check.length) {
+            console.log("returning")
+            console.log(check)
+
+            return res.status(201).json({success: true});
+
+        }
+
+        let assessments = await insertCourseAssessment_user(courseId,userId);
+
+        return res.status(201).json({success: true, assessments: assessments});
+       
+        
+     } catch (error) {
+        if(error instanceof UserError){
+           return res.status(404).json({success: false, message: "Not found"})
+        }
+        console.log(error)
+        return res.status(500).json({success: false, message: "Server Error"})
+
+     }
+}
+
 
 const findUser = async(req,res,next) =>{
     const {email} = req.params;
@@ -166,4 +266,4 @@ const registerAccount = async(req,res,next) =>{
 }
 
 
-module.exports = { fetchUserDetails ,fetchAllCourses, fetchUserCourses, Authenticate, findUser,registerAccount};
+module.exports = { postUserAssessments, fetchUserAssessments, fetchCourseAssessments, fetchUserDetails ,fetchAllCourses, fetchUserCourses, Authenticate, findUser,registerAccount};

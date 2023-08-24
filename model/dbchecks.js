@@ -1,17 +1,17 @@
 const { DatabaseError } = require('pg');
-const {DB,checkIfDbExist, createLB,checkIfTableExists,createUserTable,createCoursesTable, createCourseAssessments} = require('./connect');
+const {DB,checkIfDbExist, createLB,checkIfTableExists,createUserTable,createCoursesTable, createCourseAssessments, createCourseAssessmentUser} = require('./connect');
 
 
 async function start(){
     try{
         await DB.connect();
         //check skimpy db
-        let res = await checkIfDbExist(DB);
+        let res = await checkIfDbExist(DB,'languagebuddy');
         
 
 
         if(!res){
-            await createLB(DB);
+            await createLB(DB,"languagebuddy");
             //create the tables too
             //create user table
             await createUserTable(DB);
@@ -29,7 +29,6 @@ async function start(){
 
             if(!coursesCheck){
                 await createCoursesTable(DB)
-                //create product table
             }
 
             let courseAssessmentCheck = await checkIfTableExists('courseassessment', DB)
@@ -38,7 +37,13 @@ async function start(){
                 await createCourseAssessments(DB)
                 //create product table
             }
-            // //check orders table
+
+             let courseAssessmentUserCheck = await checkIfTableExists('course_assessment_user', DB)
+
+            if(!courseAssessmentUserCheck){
+                await createCourseAssessmentUser(DB)
+                //create product table
+            }
 
             // let ordersCheck = await checkIfTableExists('orders',DB)
 
