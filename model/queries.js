@@ -88,11 +88,9 @@ async function getUser(email){
     try{
             let result = await DB.query(query,[email]);
             if(!result.rows.length){
-                console.log("error thrown")
                 throw new UserError('User does not Exist');
                 
             }
-            console.log("fetched")
             return result.rows[0];
 
     } catch(err){
@@ -110,11 +108,9 @@ async function getUserDetails(email){
     try{
             let result = await DB.query(query,[email]);
             if(!result.rows.length){
-                console.log("error thrown")
                 throw new UserError('User does not Exist');
                 
             }
-            console.log("fetched")
             return result.rows[0];
 
     } catch(err){
@@ -172,7 +168,6 @@ async function fetchCourseUserAssessment(courseId,user_id){
 
     `
       try{
-        console.log('checking here')
         const assessments = await DB.query(query,[courseId,user_id])
        
        

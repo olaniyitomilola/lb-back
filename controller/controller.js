@@ -49,7 +49,6 @@ const fetchUserCourses = async(req,res,next)=>{
 const fetchCourseAssessments = async(req,res,next)=>{
     //TODO: authenticate with user ID
      const{courseId} = req.params;
-     console.log(courseId)
 
      if(!courseId) return res.status(400).json({sucess: false, message: "Bad Request"})
 
@@ -74,7 +73,6 @@ const fetchCourseAssessments = async(req,res,next)=>{
 const Authenticate = async(req,res,next) =>{
     const {email,password} = req.body;
 
-    console.log(email,password, Object.keys(req.body))
 
 
     //validate email input true regex too
@@ -116,7 +114,6 @@ const fetchUserDetails = async  (req,res)=>{
      try {
         const userDetails = await getUserDetails(email);
         const userCourses = await getUserCourses(userDetails.level,userDetails.language);
-        console.log('sending details' + Object.keys(userDetails))
         return res.status(200).json({success : true, courses : userCourses, details : userDetails})
         
      } catch (error) {
@@ -143,7 +140,6 @@ const fetchUserAssessments = async  (req,res)=>{
 
         let assessments = await fetchCourseUserAssessment(courseId,  userId);
 
-        console.log(assessments)
 
         return res.status(200).json({success: true, assessments: assessments});
        
@@ -163,7 +159,6 @@ const postUserAssessments = async  (req,res)=>{
      const {email} = req.user;
      const{courseId} = req.params;
 
-     console.log(req.params)
 
      if(!email) return res.status(401).json({succes: false, message: "User not found"});
      if(!courseId) return res.status(401).json({succes: false, message: "User not found"});
@@ -179,8 +174,6 @@ const postUserAssessments = async  (req,res)=>{
         let check = await fetchCourseAssessment_user(courseId,userId)
 
         if(check.length) {
-            console.log("returning")
-            console.log(check)
 
             return res.status(201).json({success: true});
 
@@ -205,8 +198,7 @@ const postUserAssessments = async  (req,res)=>{
 const findUser = async(req,res,next) =>{
     const {email} = req.params;
 
-    console.log(req.params)
-    console.log(email)
+  
 
     //validate email input true regex too
     if(!email || !emailPattern.test(email)) return res.status(400).json({success: false , message: "Bad request"})
@@ -231,7 +223,6 @@ const findUser = async(req,res,next) =>{
 }
 
 const registerAccount = async(req,res,next) =>{
-    console.log("here")
     const {firstName, lastName, email,password, level,language} = req.body;
     //validate input
     if(!firstName || !lastName || !email || !password || !level || !language){
