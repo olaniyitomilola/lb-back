@@ -27,7 +27,7 @@ const {
 } = require('./questions');
 const { dropTable } = require('./model/connect');
 const app = express();
-const port = process.env.PORT || 3001;
+const port =  3001;
 
 app.use(cors());
 app.use(express.json());
@@ -43,8 +43,12 @@ async function startApp() {
     let allset = await start();
 
     if (allset) {
-      app.listen(port, () => {
+      app.listen(port, async  () => {
         console.log(`App is listening on port ${port}`);
+         console.log(await getAllUsers())
+
+       
+      
       });
     } else {
       console.error('Something wrong with the db');

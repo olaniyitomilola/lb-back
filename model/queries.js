@@ -163,7 +163,7 @@ async function fetchCourseUserAssessment(courseId,user_id){
         FROM course_assessment_user cu
         WHERE cu.courseassessment_id = ca.id
         AND cu.user_id = $2
-);
+    );
 
 
     `

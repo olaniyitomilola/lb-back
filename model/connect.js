@@ -191,4 +191,28 @@ async function createCourseAssessmentUser(DB){
 }
 
 
+async function messagesTable(DB){
+    //SERIAL is Auto-Increment int in postgres
+     const query = `
+        CREATE TABLE IF NOT EXISTS messages(
+            id SERIAL PRIMARY KEY NOT NULL,
+            user_id UUID,
+            room_id VARCHAR(255),
+            message VARCHAR(2000),
+            dateAdded TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(user_id) REFERENCES users(id)
+        );
+    `;
+    try{
+        await DB.query(query);
+        console.log('Table: messages Table created');
+
+    }catch(err){
+        console.error(`Error:`, err)
+    }
+    
+}
+
+
+
 module.exports = {DB, createCourseAssessmentUser, dropTable, checkIfDbExist,createLB,checkIfTableExists,createUserTable,createCoursesTable,alterCourseTable,createCourseAssessments};
