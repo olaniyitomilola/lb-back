@@ -215,4 +215,4 @@ async function messagesTable(DB){
 
 
 
-module.exports = {DB, createCourseAssessmentUser, dropTable, checkIfDbExist,createLB,checkIfTableExists,createUserTable,createCoursesTable,alterCourseTable,createCourseAssessments};
+module.exports = {DB, messagesTable, createCourseAssessmentUser, dropTable, checkIfDbExist,createLB,checkIfTableExists,createUserTable,createCoursesTable,alterCourseTable,createCourseAssessments};

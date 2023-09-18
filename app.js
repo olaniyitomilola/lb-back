@@ -45,7 +45,6 @@ async function startApp() {
     if (allset) {
       app.listen(port, async  () => {
         console.log(`App is listening on port ${port}`);
-         console.log(await getAllUsers())
 
        
       

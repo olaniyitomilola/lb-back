@@ -72,13 +72,8 @@ const fetchCourseAssessments = async(req,res,next)=>{
 
 const Authenticate = async(req,res,next) =>{
     const {email,password} = req.body;
-
-
-
     //validate email input true regex too
     if(!email || !password || !emailPattern.test(email)) return res.status(400).json({success: false , message: "Bad request: Check Email"})
-    
-
     try {
         const user = await getUser(email);
         //no need to check unavailable user, handled in the query.
